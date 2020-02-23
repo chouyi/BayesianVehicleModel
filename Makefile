@@ -25,4 +25,4 @@ linpack_d_test: $(OBJS) UAV_CTmodel.o
 
 
 clean: 
-	rm -f *.o *.exe UAV_CTmodel linpack_d_test
+	rm -f *.o *.exe UAV_CTmodel 
