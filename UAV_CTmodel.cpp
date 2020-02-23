@@ -33,7 +33,7 @@ int main(){
     mintheta.push_back(-0.18);
 
     double dt=0.4;//discrete time interval dt
-    int numInt = 10;//number of intervals/grind points on each parameter dimension
+    int numInt = 100;//number of intervals/grind points on each parameter dimension
     int pre_kstep = 20;
     int test_set_start=4200;
     int test_set_end = 4300;
