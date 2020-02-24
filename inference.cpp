@@ -205,6 +205,7 @@ void computePosterior(const int numInt,const int sdim,const string model,const d
         normC+=exp(logPosterior[i]);
     }
     lognormC=log(normC);
+    if (isfinite(lognormC)== false){ lognormC=-1e+12;}
     for(int i=0;i<logPosterior.size();i++){
         logPosterior[i]-=lognormC;
     }
