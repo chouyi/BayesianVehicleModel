@@ -5,7 +5,7 @@ EXECUTE_PROCESS( COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTUR
 message( STATUS "Architecture: ${ARCHITECTURE}" )
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake-includes)
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++17 -Wall -Dregister= ")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++14 -Wall -Dregister= ")
 set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR})
 include_directories(.)
 include_directories(src)
@@ -21,7 +21,7 @@ if (NOT MPFR_FOUND)
     message(FATAL_ERROR "ERROR: MPFR not found.")
 endif(NOT MPFR_FOUND)
 
-set(POLYFORM_LIBRARIES libPolyForm.a)
+set(POLYFORM_LIBRARIES libpolynomialForm.a)
 
 find_package(MPFI REQUIRED)
 
@@ -31,9 +31,10 @@ include_directories(GSL_INCLUDE_DIRS)
 add_executable(UAV_CTModel src/blas0.hpp src/blas1_d.hpp src/linpack_d.hpp  src/blas0.cpp src/blas1_d.cpp
             src/dynamic.h src/dynamic.cpp  src/inference.h src/inference.cpp src/linpack_d.hpp src/linpack_d.cpp
             src/UAV_CTmodel.cpp
-        )
+        src/CTModelPolyForm.hh src/CTModelPolyForm.cpp )
 
 target_link_libraries(UAV_CTModel
+        ${POLYFORM_LIBRARIES}
         ${MPFR_LIBRARIES}
         ${MPFI_LIBRARIES}
         ${GMP_LIBRARIES}
@@ -41,3 +42,6 @@ target_link_libraries(UAV_CTModel
         ${GSL_CBLAS_LIBRARY}
         m
         )
+
+add_executable(CTPolyFormTest src/CTModelPolyForm.hh src/CTModelPolyForm.cpp src/CTModelPolyFormTest.cpp)
+target_link_libraries(CTPolyFormTest ${POLYFORM_LIBRARIES} ${MPFI_LIBRARIES} ${MPFR_LIBRARIES})
