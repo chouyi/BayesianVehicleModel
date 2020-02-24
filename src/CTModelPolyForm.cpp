@@ -1,7 +1,7 @@
 //
 // Created by Sriram Sankaranarayanan on 2/24/20.
 //
-
+#include <cmath>
 #include "CTModelPolyForm.hh"
 #include "PolynomialFunctions.hh"
 
@@ -17,16 +17,71 @@ void CTModelPolynomialForm::initializeForms() {
     omega.setConst(omega0);
 }
 
+MultivariatePoly specialSine(MultivariatePoly const & p, std::map<int, MpfiWrapper> const &var_env, int resultDegree) {
+    /*--
+     * Compute power series of sine around 0.0
+     *   Just make sure that the power of x is one short
+     *   Note that with remainder sin(x) =
+     *       x - x^3/6  - cos(rng) x^4/24
+     *    sin(x)/x = 1 - x^2/6 - cos(rng) x^3/24
+     */
+
+    MultivariatePoly res(1.0);
+    MultivariatePoly tmp = p.squarePoly();
+    MpfiWrapper rng = p.evaluate(var_env);
+    MpfiWrapper cos_rng = cos(rng);
+
+    //res = res -tmp/6
+    res.scaleAndAddAssign(MpfiWrapper(-1.0/6.0), tmp);
+    //tmp3 = p^3
+    MultivariatePoly tmp3 = tmp.multiply(p);
+    // res = res -1/24 cos(rng)*x^3
+    res.scaleAndAddAssign(cos_rng * MpfiWrapper(-1.0/24), tmp3);
+    res.centerAssign(var_env);
+    res.truncateAssign(resultDegree, var_env);
+    return res;
+}
+
+MultivariatePoly
+specialCosine(MultivariatePoly const &p, std::map<int, MpfiWrapper> const &var_env, int resultDegree) {
+
+    MultivariatePoly res(0.0);
+    MpfiWrapper rng = p.evaluate(var_env);
+    MpfiWrapper sin_rng = sin(rng);
+
+    res.scaleAndAddAssign(MpfiWrapper(-0.5), p);
+    MultivariatePoly tmp2 = p.squarePoly();
+    MultivariatePoly tmp3 = p.multiply(tmp2);
+    res.scaleAndAddAssign(MpfiWrapper(1.0/24), tmp3);
+    MultivariatePoly tmp4 = tmp3.multiply(p);
+    res.scaleAndAddAssign(MpfiWrapper(-1.0/120) * sin_rng, tmp4);
+    res.centerAssign(var_env);
+    res.truncateAssign(resultDegree, var_env);
+    return res;
+}
 
 
 void CTModelPolynomialForm::computeOneStep(){
     MultivariatePoly omegaT = omega;
     omegaT.scaleAssign(deltaT); // omega * T
-    MultivariatePoly sineOmegaTByOmegaT = computeSinXByX(omegaT, env, 1);
+
+    MultivariatePoly sineOmegaTByOmegaT = specialSine(omegaT, env, 1);
     sineOmegaTByOmegaT.scaleAssign(deltaT);
 
-    MultivariatePoly cosOmegaTMinusOneByOmegaT = computeCosXMinusOneByX(omegaT, env, 1);
+    MultivariatePoly cosOmegaTMinusOneByOmegaT = specialCosine(omegaT, env, 1);
     cosOmegaTMinusOneByOmegaT.scaleAssign(deltaT);
+
+    /*std::cout << "DEBUG: omegaT = " << std::endl;
+    omegaT.prettyPrint(std::cout, std::map<int, string>());
+    std::cout << std::endl;
+
+    std::cout << "DEBUG: Sin(omega t)/omega = ";
+    sineOmegaTByOmegaT.prettyPrint(std::cout, std::map<int, string>());
+    std::cout << std::endl;
+    std::cout << "DEBUG: (cos(omegat) - 1)/omega = ";
+    cosOmegaTMinusOneByOmegaT.prettyPrint(std::cout, std::map<int, string>());
+    std::cout << std::endl; */
+
 
     MultivariatePoly sineOmegaT = omegaT.sine(env);
     MultivariatePoly cosOmegaT = omegaT.cosine(env);
@@ -47,7 +102,7 @@ void CTModelPolynomialForm::computeOneStep(){
     cosTimesVx.truncateAssign(1, env);
     MultivariatePoly sinTimesVy = sineOmegaTByOmegaT.multiply(vy);
     sinTimesVy.truncateAssign(1, env);
-    y.scaleAndAddAssign(1.0, cosTimesVx);
+    y.scaleAndAddAssign(-1.0, cosTimesVx);
     y.scaleAndAddAssign(1.0, sinTimesVy);
     y.centerAssign(env);
 
@@ -70,8 +125,8 @@ void CTModelPolynomialForm::computeOneStep(){
     vy.centerAssign(env);
 
     /*-- Update for omega --*/
-    int noiseTermID = createUniform(-0.05, 0.05);
-    MultivariatePoly noiseTerm(1.0, noiseTermID);
+    int noiseTermID = createUniform(-0.045, 0.045);
+    MultivariatePoly noiseTerm(1.0,  noiseTermID);
     omega.scaleAndAddAssign(1.0, noiseTerm);
 }
 
@@ -101,8 +156,77 @@ double CTModelPolynomialForm::boundProbability(double obstacleXLow, double obsta
         MpfiWrapper ey  = y.expectation(distrInfo);
         std::cout << "After " << numSteps << "steps " << std::endl;
         std::cout << "E(x) = " << ex << std::endl;
+        std::cout << "Range(x) = " << x.evaluate(env) << std::endl;
+        std::cout << "Range(y) = " << y.evaluate(env) << std::endl;
         std::cout << "E(y) = " << ey << std::endl;
+
+
+        // We will use some template
+
         return 1.0;
+}
+
+double sinxbyx(double x){
+    if (fabs(x) <= 1E-02){
+        return 1.0 - x*x/6.0;
+    }
+    return sin(x)/x;
+}
+
+double cosxminusonebyx(double x){
+    if (fabs(x) <= 1E-02){
+        return -0.5 * x + x*x*x/24.0;
+    }
+    return (cos(x)-1.0)/x;
+}
+
+void CTModelPolynomialForm::updateState( std::vector<double> & curState){
+    double x = curState[0];
+    double y = curState[1];
+    double vx = curState[2];
+    double vy = curState[3];
+    double omega = curState[4];
+    double dt = median(deltaT);
+
+    curState[0] = x + dt* vx * sinxbyx(dt*omega) + dt * vy * cosxminusonebyx(dt * omega) ;
+    curState[1] = y - dt * vx * cosxminusonebyx(dt * omega) + dt * vy * sinxbyx(dt * omega);
+    curState[2] = cos(dt * omega) * vx - sin(dt*omega) * vy;
+    curState[3] = sin(dt*omega)* vx + cos(dt*omega) * vy;
+    curState[4] = curState[4] + (0.09 * (double) rand()/ (double) RAND_MAX -0.045);
+
+}
+
+std::vector<double> CTModelPolynomialForm::simulateModel() {
+    std::vector<double> res;
+    std::vector<double> curState;
+    curState.push_back(x0.getRandomSample());
+    curState.push_back(y0.getRandomSample());
+    curState.push_back(vx0.getRandomSample());
+    curState.push_back(vy0.getRandomSample());
+    curState.push_back(omega0.getRandomSample());
+
+    for (int i =0; i < numSteps; ++i){
+        updateState(curState);
+    }
+    return vector<double>({curState[0], curState[1]});
+
+}
+
+void CTModelPolynomialForm::printExpectationsAndRanges() {
+    MpfiWrapper ex = x.expectation(distrInfo);
+    MpfiWrapper ey  = y.expectation(distrInfo);
+    MpfiWrapper rngx = x.evaluate(env);
+    MpfiWrapper rngy = y.evaluate(env);
+    std::cout << rngx.lower() << "<= x <= " << rngx.upper() << std::endl;
+    std::cout << rngy.lower() << "<= y <= " << rngy.upper() << std::endl;
+    MultivariatePoly diff(x);
+    diff.scaleAndAddAssign(-1.0, y);
+    MpfiWrapper rng_x_minus_y = diff.evaluate(env);
+    std::cout << rng_x_minus_y.lower() << "<= x - y <= " << rng_x_minus_y.upper() << std::endl;
+    MultivariatePoly sumPoly(x);
+    sumPoly.scaleAndAddAssign(1.0, y);
+    MpfiWrapper rng_x_plus_y = sumPoly.evaluate(env);
+    std::cout << rng_x_plus_y.lower() << "<= x + y <= " << rng_x_plus_y.upper() << std::endl;
 }
 
 
