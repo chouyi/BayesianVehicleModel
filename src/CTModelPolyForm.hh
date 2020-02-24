@@ -54,12 +54,14 @@ class CTModelPolynomialForm {
 
     }
 
+    void updateState( std::vector<double> & curState);
 
     public:
 
     CTModelPolynomialForm(double omega0_,
                         double vx0Lower_, double vx0Upper_,
-                        double vy0Lower_, double vy0Upper_, double deltaT_,
+                        double vy0Lower_, double vy0Upper_,
+                        double deltaT_,
                         int numSteps_):
     omega0(omega0_),
     vx0(vx0Lower_, vx0Upper_),
@@ -74,6 +76,9 @@ class CTModelPolynomialForm {
     void computeNStepForm(bool debug=false);
 
     double boundProbability(double obstacleXLow, double obstacleXHi, double obstacleYLo, double obstacleYHi);
+
+    void printExpectationsAndRanges();
+    std::vector<double> simulateModel();
 
 };
 
