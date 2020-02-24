@@ -17,6 +17,8 @@
 
 using namespace std;
 
+const string ctModelDataFile = "../data/UAV_data.txt";
+
 //template<class T>
 //void display(T A[N][N])
 //{
@@ -77,7 +79,7 @@ int main(){
     
     ////read data
     vector <vector<double>> M,M_training,M_test;
-    std::ifstream infile("UAV_data.txt");
+    std::ifstream infile(ctModelDataFile);
     std::string line;
     while (std::getline(infile, line))
     {
