@@ -157,14 +157,14 @@ double log_mvnpdf(const vector<double> & mu,const  vector<double> & x,const vect
     for(int i=0;i<n;i++){
         dx[i]=x[i]-mu[i];
     }
-    
+    //cout<<dx[0]<<" " <<dx[1]<<" " <<dx[2]<<" " <<dx[3]<<" " <<endl;
     vector<double> v(n,0.0);
     for(int i=0;i<inv_cov.size();i++){
         for(int j=0;j<n;j++){
             v[i]=v[i]+inv_cov[i][j]*dx[j];
         }
     }
-//    //cout<<inv_cov[0][0]<<" "<<inv_cov[0][1]<<" "<<inv_cov[0][2]<<" "<<inv_cov[0][3]<<endl;
+    //cout<<inv_cov[0][0]<<" "<<inv_cov[0][1]<<" "<<inv_cov[0][2]<<" "<<inv_cov[0][3]<<endl;
 //    cout<<v[0]<<" "<<v[1]<<" "<<v[2]<<" "<<v[3]<<endl;
 //    cout<<v[0]<<" "<<dx[1]<<" "<<dx[2]<<" "<<dx[3]<<endl;
     double res=0;
