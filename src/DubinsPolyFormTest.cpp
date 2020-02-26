@@ -16,10 +16,12 @@ void dubinsGenerateReachData(std::vector<double> u_vValues, std::vector<double> 
         for (auto u_psi: u_psiValues){
             for (double v0 = v0Lower; v0 < v0Upper; v0 = v0 + v0Delta){
                 std::cout << "u_v = " << u_v << ", u_psi = " << u_psi << ", v0 in " <<  v0 << ", " <<v0+v0Delta << std::endl;
+                outf << u_v << "," << u_psi << "," << v0 << "," << v0 + v0Delta ;
                 DubinsPolyForm dpf(u_v, u_psi, v0, v0+v0Delta, deltaT, numSteps, maxDegree);
                 dpf.computeNStepForm(debug);
                 dpf.printExpectationsAndRanges();
                 dpf.printSpreadsheetRow(outf);
+                outf << std::endl;
                 //dpf.testWithSimulations(10000);
 
             }
