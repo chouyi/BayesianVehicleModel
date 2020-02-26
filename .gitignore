@@ -1,0 +1,8 @@
+.DS_Store
+.DS_Store.orig
+*.o 
+*.exe
+CMakeFiles/
+debug/
+Makefile
+cmake-build-debug/

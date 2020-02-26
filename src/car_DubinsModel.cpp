@@ -17,16 +17,7 @@
 
 using namespace std;
 
-//template<class T>
-//void display(T A[N][N])
-//{
-//    for (int i=0; i<N; i++)
-//    {
-//        for (int j=0; j<N; j++)
-//            cout << A[i][j] << " ";
-//        cout << endl;
-//    }
-//}
+//const string ctModelDataFile = "../data/car_data.txt";
 int main(){
     vector<double> maxtheta,mintheta,delta_p;
     maxtheta.push_back(1);
@@ -34,11 +25,11 @@ int main(){
     mintheta.push_back(-1);
     mintheta.push_back(-2);
 
-    double dt=0.1;//discrete time interval dt
-    int numInt = 50;//number of intervals/grind points on each parameter dimension
+    double dt=0.5;//discrete time interval dt
+    int numInt = 10;//number of intervals/grind points on each parameter dimension
     int pre_kstep = 20;
-    int test_set_start=51;
-    int test_set_end = 100;
+    int test_set_start=1;
+    int test_set_end = 20;
     for (int i=0;i<maxtheta.size();i++){
         double delta_temp = (maxtheta[i] - mintheta[i])/numInt/2.0;;
         delta_p.push_back(delta_temp);
@@ -79,7 +70,8 @@ int main(){
     
     ////read data
     vector <vector<double>> M,M_training,M_test;
-    std::ifstream infile("car_data.txt");
+    
+    std::ifstream infile("../data/car_data.txt");
     std::string line;
     while (std::getline(infile, line))
     {
@@ -91,18 +83,19 @@ int main(){
         }
         M.push_back(row);
     }
+
     //std::cout.setf(std::ios_base::fixed, std::ios_base::floatfield);
     //std::cout.precision(2);
     //cout<<M[0][0]<<" "<<M[0][45]<<endl;
     //cout<<M.size()<<" "<< M[0].size()<<endl;
                  
-    int training_set_start=1;//test_set_start-50;
-    int training_set_end =50; //test_set_start;
-    int NT_train=training_set_end- training_set_start;
-
-    for(int i=training_set_start-1;i<training_set_end;i++){
-        M_training.push_back(M[i]);
-    }
+//    int training_set_start=1;//test_set_start-50;
+//    int training_set_end =50; //test_set_start;
+//    int NT_train=training_set_end- training_set_start;
+//
+//    for(int i=training_set_start-1;i<training_set_end;i++){
+//        M_training.push_back(M[i]);
+//    }
     for(int i=test_set_start-1;i<test_set_end;i++){
         M_test.push_back(M[i]);
     }
@@ -114,7 +107,8 @@ int main(){
     
     
     // Calc cov matrix
-    vector <vector<double>> cov(sdim,vector<double> (sdim)), error_train(sdim,vector<double> (NT_train-1)),inv_cov(sdim,vector<double> (sdim));
+    vector <vector<double>> cov(sdim,vector<double> (sdim)), inv_cov(sdim,vector<double> (sdim));
+    //vector <vector<double>> error_train(sdim,vector<double> (NT_train-1));
     cov[0][0]=0.03;
     cov[0][1]=0.001;
     cov[1][0]=cov[0][1];
@@ -160,7 +154,7 @@ int main(){
 //    //compute the covariance of error
 //    CalculateVariane_matrix(error_train,cov);
     //compute the inverse of covariance
-//    inverse_cov(cov,inv_cov);
+    inverse_cov(cov,inv_cov);
 //    cout<<cov[0][0]<<" "<<cov[0][1]<<" "<<cov[0][2]<<" "<<cov[0][3]<<" "<<endl;
 //    cout<<cov[1][0]<<" "<<cov[1][1]<<" "<<cov[1][2]<<" "<<cov[1][3]<<" "<<endl;
 //    cout<<cov[2][0]<<" "<<cov[2][1]<<" "<<cov[2][2]<<" "<<cov[2][3]<<" "<<endl;
@@ -211,6 +205,17 @@ int main(){
         output_logPosterior_list << "\n";
     }
     output_logPosterior_list.close();
+    
+    std::ofstream output_theta_list("theta_list.txt");
+    for (int i=0;i<theta_list.size();i++)
+    {
+        for (int j=0;j<theta_list[0].size();j++)
+        {
+            output_theta_list << theta_list[i][j] << " ";
+        }
+        output_theta_list << "\n";
+    }
+    output_theta_list.close();
     
 
 
