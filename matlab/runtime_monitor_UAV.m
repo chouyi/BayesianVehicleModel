@@ -5,7 +5,7 @@ omega_min=-0.18;
 T=0.4;%discrete time interval dt
 para.num_p = 20;%number of omega particals
 np=1;% number of parameter;
-n_g=para.num_p^np;% number of grid points;
+
 delta = (omega_max - omega_min)/(2*para.num_p);
 CT.A=zeros(4,4,para.num_p);
 for i=1:para.num_p
@@ -113,7 +113,7 @@ x = zeros(dim, NT+1);
 
         %%predict prob of collision after k steps at kT
         sum1=0;
-        for w_idx=1:n_g  
+        for w_idx=1:para.num_p 
             w=theta(w_idx);
            
             collision = oracle(obs_zone,w, x(2,t+1), x(4,t+1), x(1,t+1), x(3,t+1), pre_com);
