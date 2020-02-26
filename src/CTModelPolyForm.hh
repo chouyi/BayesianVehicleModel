@@ -20,7 +20,8 @@ class CTModelPolynomialForm {
     MpfiWrapper x0;
     MpfiWrapper y0;
     MpfiWrapper deltaT;
-
+    double omegaLow = -0.18;
+    double omegaHi = 0.18;
 
     std::map<int, DistributionInfoPtr> distrInfo;
     std::map<int, MpfiWrapper> env;
@@ -31,6 +32,7 @@ class CTModelPolynomialForm {
     MultivariatePoly omega;
     int numSteps;
     int randomVarID;
+    int maxDegree;
 
     void initializeForms();
     void computeOneStep();
@@ -62,7 +64,7 @@ class CTModelPolynomialForm {
                         double vx0Lower_, double vx0Upper_,
                         double vy0Lower_, double vy0Upper_,
                         double deltaT_,
-                        int numSteps_):
+                        int numSteps_, int maxDegree_ = 1):
     omega0(omega0_),
     vx0(vx0Lower_, vx0Upper_),
     vy0(vy0Lower_, vy0Upper_),
@@ -70,7 +72,8 @@ class CTModelPolynomialForm {
     y0(0.0),
     deltaT(deltaT_),
     numSteps(numSteps_),
-    randomVarID(0)
+    randomVarID(0),
+    maxDegree(maxDegree_)
     {}
 
     void computeNStepForm(bool debug=false);
@@ -79,6 +82,7 @@ class CTModelPolynomialForm {
 
     void printExpectationsAndRanges();
     std::vector<double> simulateModel();
+    void printSpreadsheetRow(ostream & outFileHandle);
 
 };
 

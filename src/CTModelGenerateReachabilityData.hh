@@ -10,5 +10,7 @@ void ctModelGenerateReachabilityData(std::vector<double> omegaValues,
                                         double vLow, double vHi,
                                         double vDelta,
                                         double deltaT,
-                                        int numSteps);
+                                        int numSteps,
+                                        int maxDegree,
+                                        std::string outputFileName);
 #endif //BAYESIANVEHICLEMODEL_CTMODELGENERATEREACHABILITYDATA_HH

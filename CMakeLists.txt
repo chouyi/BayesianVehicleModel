@@ -30,8 +30,7 @@ include_directories(GSL_INCLUDE_DIRS)
 
 add_executable(UAV_CTModel src/blas0.hpp src/blas1_d.hpp src/linpack_d.hpp  src/blas0.cpp src/blas1_d.cpp
             src/dynamic.h src/dynamic.cpp  src/inference.h src/inference.cpp src/linpack_d.hpp src/linpack_d.cpp
-            src/UAV_CTmodel.cpp
-        src/CTModelPolyForm.hh src/CTModelPolyForm.cpp src/CTModelGenerateReachabilityData.hh src/CTModelGenerateReachabilityData.cpp)
+            src/UAV_CTmodel.cpp)
 
 target_link_libraries(UAV_CTModel
         ${POLYFORM_LIBRARIES}
@@ -45,3 +44,6 @@ target_link_libraries(UAV_CTModel
 
 add_executable(CTPolyFormTest src/CTModelPolyForm.hh src/CTModelPolyForm.cpp src/CTModelPolyFormTest.cpp src/CTModelGenerateReachabilityData.hh src/CTModelGenerateReachabilityData.cpp)
 target_link_libraries(CTPolyFormTest ${POLYFORM_LIBRARIES} ${MPFI_LIBRARIES} ${MPFR_LIBRARIES})
+
+add_executable(DubinsPolyFormTest src/DubinsPolyForm.hh src/DubinsPolyForm.cpp src/DubinsPolyFormTest.cpp )
+target_link_libraries(DubinsPolyFormTest ${POLYFORM_LIBRARIES} ${MPFI_LIBRARIES} ${MPFR_LIBRARIES})

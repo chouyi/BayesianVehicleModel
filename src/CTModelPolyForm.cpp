@@ -53,7 +53,7 @@ specialCosine(MultivariatePoly const &p, std::map<int, MpfiWrapper> const &var_e
     MultivariatePoly tmp2 = p.squarePoly();
     MultivariatePoly tmp3 = p.multiply(tmp2);
     res.scaleAndAddAssign(MpfiWrapper(1.0/24), tmp3);
-    MultivariatePoly tmp4 = tmp3.multiply(p);
+    MultivariatePoly tmp4 = tmp2.squarePoly();
     res.scaleAndAddAssign(MpfiWrapper(-1.0/120) * sin_rng, tmp4);
     res.centerAssign(var_env);
     res.truncateAssign(resultDegree, var_env);
@@ -65,10 +65,10 @@ void CTModelPolynomialForm::computeOneStep(){
     MultivariatePoly omegaT = omega;
     omegaT.scaleAssign(deltaT); // omega * T
 
-    MultivariatePoly sineOmegaTByOmegaT = specialSine(omegaT, env, 1);
+    MultivariatePoly sineOmegaTByOmegaT = specialSine(omegaT, env, maxDegree);
     sineOmegaTByOmegaT.scaleAssign(deltaT);
 
-    MultivariatePoly cosOmegaTMinusOneByOmegaT = specialCosine(omegaT, env, 1);
+    MultivariatePoly cosOmegaTMinusOneByOmegaT = specialCosine(omegaT, env, maxDegree);
     cosOmegaTMinusOneByOmegaT.scaleAssign(deltaT);
 
     /*std::cout << "DEBUG: omegaT = " << std::endl;
@@ -88,10 +88,10 @@ void CTModelPolynomialForm::computeOneStep(){
 
     /*-- Update for x --*/
     MultivariatePoly sinTimesVx = sineOmegaTByOmegaT.multiply(vx);
-    sinTimesVx.truncateAssign(1, env);
+    sinTimesVx.truncateAssign(maxDegree, env);
 
     MultivariatePoly cosTimesVy = cosOmegaTMinusOneByOmegaT.multiply(vy);
-    cosTimesVy.truncateAssign(1, env);
+    cosTimesVy.truncateAssign(maxDegree, env);
 
     x.scaleAndAddAssign(MpfiWrapper(1.0), sinTimesVx);
     x.scaleAndAddAssign(MpfiWrapper(1.0), cosTimesVy);
@@ -99,9 +99,9 @@ void CTModelPolynomialForm::computeOneStep(){
 
     /*-- Update for y --*/
     MultivariatePoly cosTimesVx = cosOmegaTMinusOneByOmegaT.multiply(vx);
-    cosTimesVx.truncateAssign(1, env);
+    cosTimesVx.truncateAssign(maxDegree, env);
     MultivariatePoly sinTimesVy = sineOmegaTByOmegaT.multiply(vy);
-    sinTimesVy.truncateAssign(1, env);
+    sinTimesVy.truncateAssign(maxDegree, env);
     y.scaleAndAddAssign(-1.0, cosTimesVx);
     y.scaleAndAddAssign(1.0, sinTimesVy);
     y.centerAssign(env);
@@ -109,17 +109,17 @@ void CTModelPolynomialForm::computeOneStep(){
     /*-- Update for vx --*/
     MultivariatePoly v11 = cosOmegaT.multiply(vx);
     MultivariatePoly v12 = sineOmegaT.multiply(vy);
-    v11.truncateAssign(1, env);
-    v12.truncateAssign(1, env);
+    v11.truncateAssign(maxDegree, env);
+    v12.truncateAssign(maxDegree, env);
     vx = v11;
     vx.scaleAndAddAssign(-1.0, v12);
-    vy.centerAssign(env);
+    vx.centerAssign(env);
 
     /*-- Update for vy --*/
     MultivariatePoly v21 = sineOmegaT.multiply(vx);
     MultivariatePoly v22 = cosOmegaT.multiply(vy);
-    v21.truncateAssign(1, env);
-    v22.truncateAssign(2, env);
+    v21.truncateAssign(maxDegree, env);
+    v22.truncateAssign(maxDegree, env);
     vy = v21;
     vy.scaleAndAddAssign(1.0, v22);
     vy.centerAssign(env);
@@ -138,6 +138,12 @@ void CTModelPolynomialForm::computeNStepForm(bool debug){
             std::cout << "Step # " << i << std::endl;
         }
         computeOneStep();
+        if (i % 5 == 0){
+            MpfiWrapper omegaRng = omega.evaluate(env);
+            omegaRng= intersect(omegaRng, MpfiWrapper(omegaLow, omegaHi));
+            omega = MultivariatePoly(omegaRng);
+
+        }
         if (debug){
             std::cout << "x = " << std::endl;
             x.prettyPrint(std::cout, dummy_printer);
@@ -227,6 +233,23 @@ void CTModelPolynomialForm::printExpectationsAndRanges() {
     sumPoly.scaleAndAddAssign(1.0, y);
     MpfiWrapper rng_x_plus_y = sumPoly.evaluate(env);
     std::cout << rng_x_plus_y.lower() << "<= x + y <= " << rng_x_plus_y.upper() << std::endl;
+}
+
+void CTModelPolynomialForm::printSpreadsheetRow(ostream & outFileHandle) {
+    MpfiWrapper rngx = x.evaluate(env);
+    MpfiWrapper rngy = y.evaluate(env);
+    MultivariatePoly diff(x);
+    diff.scaleAndAddAssign(-1.0, y);
+    MpfiWrapper rng_x_minus_y = diff.evaluate(env);
+    rng_x_minus_y = intersect(rng_x_minus_y, rngx-rngy);
+    MultivariatePoly sumPoly(x);
+    sumPoly.scaleAndAddAssign(1.0, y);
+    MpfiWrapper rng_x_plus_y = sumPoly.evaluate(env);
+    rng_x_plus_y = intersect(rng_x_plus_y, rngx+rngy);
+    outFileHandle << "," << rngx.lower() << "," << rngx.upper();
+    outFileHandle << "," << rngy.lower() << "," << rngy.upper();
+    outFileHandle << "," << rng_x_minus_y.lower() << "," << rng_x_minus_y.upper();
+    outFileHandle << "," << rng_x_plus_y.lower() << "," << rng_x_plus_y.upper();
 }
 
 
