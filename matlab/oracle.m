@@ -5,6 +5,7 @@ function collision = oracle(obs, w, vx, vy, x, y, pre_com)
     
     % Find a row number using omega and velocity
     v = sqrt(vx^2+vy^2);
+
     num_row = find(pre_com(:,1)==w & pre_com(:,2) <= v & pre_com(:,3) > v);
     max_x = 50;
 
