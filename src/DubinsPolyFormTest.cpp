@@ -50,7 +50,7 @@ int main(int argc, char * argv[]){
     std::vector<double> u_vValues = {-0.45, -0.35, -0.25,-0.15,-0.05, 0.05, 0.15,0.25,0.35,0.45};//{-0.9, -0.7, -0.5, -0.3, -0.1, 0.1, 0.3, 0.5, 0.7, 0.9};
     std::vector<double> u_psiValues ={-0.45, -0.35, -0.25,-0.15,-0.05, 0.05, 0.15,0.25,0.35,0.45};// {-1.8, -1.4, -1.0, -0.6, -0.2, 0.2, 0.6, 1.0, 1.4, 1.8};
     double v0Lower = 1.0;//10.0;
-    double v0Upper = 6.0;//20;
+    double v0Upper = 15.0;//20;
     double v0Delta = 0.25;//0.5;
     auto start = chrono::high_resolution_clock::now();
     dubinsGenerateReachData(u_vValues, u_psiValues, v0Lower, v0Upper, v0Delta, deltaT,numSteps,maxDegree, outFileHandle);

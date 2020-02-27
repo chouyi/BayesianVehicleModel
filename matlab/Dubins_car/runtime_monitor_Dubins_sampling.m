@@ -4,6 +4,7 @@ close all;
 %% Input /
 test_set_start=1;
 test_set_end = 2;
+Ns=20;% the number of testing samples of trajectory 
 
 %% Load data
 pred_step = 4;
@@ -15,7 +16,7 @@ pre_com = csvread('../../outputs/dubins-5-2.csv');
 dt=0.5;%discrete time interval dt
 numInt = 10;%number of intervals/grind points on each parameter dimension
 np=2;%paramer dim
-Ns=20;% the number of testing samples of trajectory 
+
 maxtheta=[0.5 0.5];%[1 2];
 mintheta=[-0.5 -0.5];%[-1 -2];
 
