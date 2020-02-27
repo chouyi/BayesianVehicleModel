@@ -134,7 +134,7 @@ x = zeros(dim, NT+1);
             w=theta(w_idx);
 
             pred_X=predict_ksteps_sampling_UAV(Ns,dOmega,w,para,x(:,t+1),dynamic,pre_kstep);
-            temp_pc=Prob_collision(pred_X(:,:,pre_kstep),obs);
+            temp_pc=Prob_collision(pred_X(1,:,pre_kstep),pred_X(3,:,pre_kstep),obs);
             
             sum1=sum1 + temp_pc*post(w_idx);
             

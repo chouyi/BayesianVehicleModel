@@ -42,11 +42,13 @@ void DubinsPolyForm::computeOneStep() {
     v.scaleAndAddAssign(deltaT, u_v);
     psi.scaleAndAddAssign(deltaT, u_psi);
 
-    int u_vChange = createUniform(-0.25, 0.25);
+    //int u_vChange = createUniform(-0.25, 0.25);
+    int u_vChange = createUniform(-0.05, 0.05);
     MultivariatePoly u_vChangePoly(1.0, u_vChange);
     u_v.scaleAndAddAssign(1.0, u_vChangePoly);
 
-    int u_psiChange = createUniform(-0.02, 0.02);
+    //int u_psiChange = createUniform(-0.02, 0.02);
+    int u_psiChange = createUniform(-0.01, 0.01);
     MultivariatePoly u_psiChangePoly(1.0, u_psiChange);
     u_psi.scaleAndAddAssign(1.0, u_psiChangePoly);
 }
@@ -122,8 +124,10 @@ std::vector<double> DubinsPolyForm::runOneSimulation() {
     double u_v = median(u_v0);
     double u_psi = median(u_psi0);
     double dt = median(deltaT);
-    MpfiWrapper u_vChange(-0.25, 0.25);
-    MpfiWrapper u_psiChange(-0.02, 0.02);
+//    MpfiWrapper u_vChange(-0.25, 0.25);
+//    MpfiWrapper u_psiChange(-0.02, 0.02);
+    MpfiWrapper u_vChange(-0.05, 0.05);
+    MpfiWrapper u_psiChange(-0.01, 0.01);
     for (int i =0; i < numSteps; ++i){
         x  = x + dt * v * cos(psi) + 0.5 * dt * dt * u_v * cos(psi);
         y = y + dt * v * sin(psi) + 0.5 * dt * dt * u_v * sin(psi);

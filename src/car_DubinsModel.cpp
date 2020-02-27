@@ -20,10 +20,10 @@ using namespace std;
 //const string ctModelDataFile = "../data/car_data.txt";
 int main(){
     vector<double> maxtheta,mintheta,delta_p;
-    maxtheta.push_back(1);
-    maxtheta.push_back(2);
-    mintheta.push_back(-1);
-    mintheta.push_back(-2);
+    maxtheta.push_back(0.5);
+    maxtheta.push_back(0.5);
+    mintheta.push_back(-0.5);
+    mintheta.push_back(-0.5);
 
     double dt=0.5;//discrete time interval dt
     int numInt = 10;//number of intervals/grind points on each parameter dimension
