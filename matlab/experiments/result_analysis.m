@@ -1,18 +1,29 @@
 clear all;
 threshold = 0.950;
-
-total_report_collision = zeros(15,2);
-total_report_no_collision = zeros(15,2);
-% 1. Different update time to allow some time to update posterior
-% 2. Different steps - collision
+%UAV
 pred_step_set = [5 10 15];
 update_step_set = [0 10 20 50 100];
+%Dubins car
+pred_step_set_dubins = [4];
+update_step_set_dubins = [0 10 20 50];
 
+outputname = ['./report/UAV_reachable_set-' './report/UAV_sampling-'...
+              './report/dubins_reachable_set-' './report/dubins_sampling-'];
+
+total_report = zeros(15,8);
+total_report_UAV_reachable_set = zeros(15,2);
+total_report_UAV_sampling = zeros(15,2);
+total_report_dubins_reachable_set = zeros(15,2);
+total_report_dubins_sampling = zeros(15,2);
+
+for k = 1:2
+    outputname = outputname(k);
 for j = 1:size(pred_step_set,2)
     for l = 1:size(update_step_set,2)
         update_step = update_step_set(l);  
         pred_step = pred_step_set(j); 
-        filename = strcat('./results_figures/reachable_set/collision/',string(update_step), '-', string(pred_step), '/result_report2.csv');
+        filename = strcat(outputname,string(update_step), '-', string(pred_step),'result_report.csv');
+        
         result = csvread(filename);
         computation_time = mean(result(:, 5));
         correct = 0;
@@ -29,26 +40,32 @@ for j = 1:size(pred_step_set,2)
         rate_correct = correct / (correct+wrong);
         rate_wrong = wrong / (correct+wrong);
         
-        total_report_collision(l+(j-1)*size(update_step_set,2), 1) = rate_correct;
-        total_report_collision(l+(j-1)*size(update_step_set,2), 2) = rate_wrong;
+        total_report(l+(j-1)*size(update_step_set,2), k+2*(k-1)) = rate_correct;
+        total_report(l+(j-1)*size(update_step_set,2), k+2*(k-1)+1) = rate_wrong;
     end
 end
-% 3. Different steps ? no collision (close enough, random distance between 1-10)
-clear result rate_correct rate_wrong
+    total_report_UAV_reachable_set = total_report(:,1:2);
+    total_report_UAV_sampling = total_report(:,3:4);
+end
+
+
+for k = 3:4
+    outputname = outputname(k);
 for j = 1:size(pred_step_set,2)
     for l = 1:size(update_step_set,2)
-        update_step = update_step_set(l);  
-        pred_step = pred_step_set(j); 
-        filename = strcat('./results_figures/reachable_set/no_collision/',string(update_step), '-', string(pred_step), '/result_report3.csv');
+        update_step = update_step_set_dubins(l);  
+        pred_step = pred_step_set_dubins(j); 
+        filename = strcat(outputname,string(update_step), '-', string(pred_step),'result_report.csv');
+        
         result = csvread(filename);
         computation_time = mean(result(:, 5));
         correct = 0;
         wrong = 0;
 
         for i = 1:size(result,1)
-            if result(i,2) == 0 && result(i,3) < threshold 
+            if result(i,2) == 1 && result(i,3) >= threshold 
                 correct = correct + 1;
-            elseif result(i,2) == 0 && result(i,3) >= threshold 
+            elseif result(i,2) == 1 && result(i,3) < threshold 
                 wrong = wrong + 1;
             end
         end
@@ -56,7 +73,10 @@ for j = 1:size(pred_step_set,2)
         rate_correct = correct / (correct+wrong);
         rate_wrong = wrong / (correct+wrong);
         
-        total_report_no_collision(l+(j-1)*size(update_step_set,2), 1) = rate_correct;
-        total_report_no_collision(l+(j-1)*size(update_step_set,2), 2) = rate_wrong;
+        total_report(l+(j-1)*size(update_step_set,2), k+2*(k-1)) = rate_correct;
+        total_report(l+(j-1)*size(update_step_set,2), k+2*(k-1)+1) = rate_wrong;
     end
+end
+    total_report_dubins_reachable_set = total_report(:,5:6);
+    total_report_dubins_sampling = total_report(:,7:8);
 end

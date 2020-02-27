@@ -1,5 +1,5 @@
-clear;
-close all;
+% clear;
+% close all;
 %%
 % Test: Collision detection -> accuracy including false alarm rate, time performance
 % 1-1: 5 steps, collision, close but not collision
@@ -17,16 +17,17 @@ close all;
 %% Setting
 pred_step_set = [4];
 update_step_set = [0 10 20 50];
-ptime = 2; % pause time to see figures before closing it
+ptime = 0; % pause time to see figures before closing it
 
 model = 2; %dubins=2
-num_test = 2;
+num_test = 500;
 
 obs_size = 4;
 obs_dist_min = 0;
 obs_dist_max = 0;
 
-output_filename = strcat('./result_report.csv');
+mkdir report
+output_filename = 'result_report.csv';
 
 %% 
 for j = 1:size(pred_step_set,2)
@@ -108,10 +109,10 @@ for j = 1:size(pred_step_set,2)
     %     saveas(gcf,filename)
     %     saveas(gcf,filename_fig)
         set(gca,'DataAspectRatio', [1 1 1]);
-        pause(ptime);
+%         pause(ptime);
         close all;
     end
-        writematrix(result_report,output_filename)
-    
+        filename = strcat('./report/Dubins_reachable_set-',string(update_step), '-', string(pred_step),output_filename);
+        writematrix(result_report,filename)    
     end
 end
