@@ -7,9 +7,9 @@ vector<double> CTmodel_dynamic(vector<double> cur_x,vector<double> theta,double 
     double W=theta[0];
     double WT=W*dt;
     if(W==0){
-        next_x[0]= cur_x[0] + cur_x[1] - cur_x[3];
+        next_x[0]= cur_x[0] + cur_x[1] ;
         next_x[1]= cos(WT)*cur_x[1] -sin(WT)*cur_x[3];
-        next_x[2]= cur_x[1] + cur_x[2] + cur_x[3];
+        next_x[2]= cur_x[2] + cur_x[3];
         next_x[3]= sin(WT)*cur_x[1] + cos(WT)*cur_x[3];
     }else{
         next_x[0]=cur_x[0] + sin(WT)/W*cur_x[1] - (1-cos(WT))/W*cur_x[3];
