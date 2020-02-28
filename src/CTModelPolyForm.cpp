@@ -88,40 +88,40 @@ void CTModelPolynomialForm::computeOneStep(){
 
     /*-- Update for x --*/
     MultivariatePoly sinTimesVx = sineOmegaTByOmegaT.multiply(vx);
-    sinTimesVx.truncateAssign(maxDegree, env);
-
     MultivariatePoly cosTimesVy = cosOmegaTMinusOneByOmegaT.multiply(vy);
-    cosTimesVy.truncateAssign(maxDegree, env);
-
     x.scaleAndAddAssign(MpfiWrapper(1.0), sinTimesVx);
     x.scaleAndAddAssign(MpfiWrapper(1.0), cosTimesVy);
+    x.truncateAssign(maxDegree,env);
     x.centerAssign(env);
 
     /*-- Update for y --*/
     MultivariatePoly cosTimesVx = cosOmegaTMinusOneByOmegaT.multiply(vx);
-    cosTimesVx.truncateAssign(maxDegree, env);
     MultivariatePoly sinTimesVy = sineOmegaTByOmegaT.multiply(vy);
-    sinTimesVy.truncateAssign(maxDegree, env);
     y.scaleAndAddAssign(-1.0, cosTimesVx);
     y.scaleAndAddAssign(1.0, sinTimesVy);
+    y.truncateAssign(maxDegree, env);
     y.centerAssign(env);
 
     /*-- Update for vx --*/
     MultivariatePoly v11 = cosOmegaT.multiply(vx);
     MultivariatePoly v12 = sineOmegaT.multiply(vy);
-    v11.truncateAssign(maxDegree, env);
-    v12.truncateAssign(maxDegree, env);
+    int vx_noiseID = createUniform(-0.2, 0.2);
+    MultivariatePoly vx_noise(1.0,  vx_noiseID);
     vx = v11;
     vx.scaleAndAddAssign(-1.0, v12);
+    vx.scaleAndAddAssign(1.0, vx_noise);
+    vx.truncateAssign(maxDegree, env);
     vx.centerAssign(env);
 
     /*-- Update for vy --*/
     MultivariatePoly v21 = sineOmegaT.multiply(vx);
     MultivariatePoly v22 = cosOmegaT.multiply(vy);
-    v21.truncateAssign(maxDegree, env);
-    v22.truncateAssign(maxDegree, env);
+    int vy_noiseID = createUniform(-0.2, 0.2);
+    MultivariatePoly vy_noise(1.0,  vy_noiseID);
     vy = v21;
     vy.scaleAndAddAssign(1.0, v22);
+    vy.scaleAndAddAssign(1.0, vy_noise);
+    vy.truncateAssign(maxDegree, env);
     vy.centerAssign(env);
 
     /*-- Update for omega --*/
@@ -138,7 +138,7 @@ void CTModelPolynomialForm::computeNStepForm(bool debug){
             std::cout << "Step # " << i << std::endl;
         }
         computeOneStep();
-        if (i % 5 == 0){
+        if (i > 0 && i % 5 == 0){
             MpfiWrapper omegaRng = omega.evaluate(env);
             omegaRng= intersect(omegaRng, MpfiWrapper(omegaLow, omegaHi));
             omega = MultivariatePoly(omegaRng);
