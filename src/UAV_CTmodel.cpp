@@ -31,11 +31,11 @@ const string ctModelDataFile = "../data/UAV_data.txt";
 //}
 int main(){
     vector<double> maxtheta,mintheta,delta_p;
-    maxtheta.push_back(0.18);
-    mintheta.push_back(-0.18);
+    maxtheta.push_back(0.3);
+    mintheta.push_back(-0.3);
 
     double dt=0.4;//discrete time interval dt
-    int numInt = 20;//number of intervals/grind points on each parameter dimension
+    int numInt = 40;//number of intervals/grind points on each parameter dimension
     int pre_kstep = 20;
     int test_set_start=4200;
     int test_set_end = 4300;
@@ -194,7 +194,16 @@ int main(){
     }
     output_logPosterior_list.close();
 
-    
+    std::ofstream output_theta_list("theta_list.txt");
+    for (int i=0;i<theta_list.size();i++)
+    {
+        for (int j=0;j<theta_list[0].size();j++)
+        {
+            output_theta_list << theta_list[i][j] << " ";
+        }
+        output_theta_list << "\n";
+    }
+    output_theta_list.close();
     
 
 
