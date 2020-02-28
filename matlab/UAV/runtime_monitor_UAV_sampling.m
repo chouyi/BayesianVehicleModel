@@ -51,7 +51,7 @@ idx.vy = 6;         idx.vx = 7;         idx.vz = 8;
 
 para.prior_initial=(1/para.num_p)*ones(1,para.num_p);%@(x) unifpdf(x,omega_min,omega_max);
 para.prior=para.prior_initial;
-
+para.epsilon=0.1;
 %% Real-time part
 result_report = zeros(1,3);
 t= NT;
@@ -95,7 +95,7 @@ for t = 1:NT
     x(:,t+1) = [M_test(t+1,idx.xx); M_test(t+1,idx.vx); M_test(t+1,idx.xy);M_test(t+1,idx.vy)];
 
     post=computePosterior_CTmodel(para,x(:,t),x(:,t+1),CT); 
-    para.prior=post;%(1-para.epsilon)*post+para.epsilon*para.prior_initial;
+    para.prior=(1-para.epsilon)*post+para.epsilon*para.prior_initial;
 
     % Only consider the last position
     if t== NT  
