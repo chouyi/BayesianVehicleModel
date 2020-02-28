@@ -40,8 +40,12 @@ int main(int argc, char * argv[]){
     int numSteps = 5;
     int maxDegree = 1;
     string outFileName = "output.csv";
+    double vx0Lower = 8.0;
+    double vx0Upper = 22.0;
+    double vx0Delta = 0.1;
     if (argc > 1){
         outFileName = string(argv[1]);
+        std::cout << "Output File: " << outFileName << std::endl;
     }
     if (argc > 2){
         numSteps = atoi(argv[2]);
@@ -52,12 +56,16 @@ int main(int argc, char * argv[]){
         std::cout << "Max Degree: " << maxDegree << std::endl;
     }
 
+    if (argc > 5){
+        vx0Lower = atof(argv[4]);
+        vx0Upper = atof(argv[5]);
+        std::cout << "Velocity range: " << vx0Lower << "," << vx0Upper << std::endl;
+    }
+
     std::vector<double> omega0Values = { -0.171, -0.153,-0.135, -0.117, -0.099,   -0.081,  -0.063, -0.045,
                                          -0.027,  -0.009,0.009, 0.027, 0.045, .063, 0.081,  0.099, 0.117,
                                          0.135,  0.153, 0.171 };
-    double vx0Lower = 8.0;
-    double vx0Upper = 22.0;
-    double vx0Delta = 0.5;
+
     auto start = chrono::high_resolution_clock::now();
     ctModelGenerateReachabilityData(omega0Values, vx0Lower, vx0Upper, vx0Delta, 0.4, numSteps, maxDegree, outFileName);
     std::cout << "Output CSV in " << outFileName;
