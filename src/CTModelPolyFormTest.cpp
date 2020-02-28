@@ -56,7 +56,6 @@ int main(int argc, char * argv[]){
         std::cout << "Max Degree: " << maxDegree << std::endl;
     }
 
-<<<<<<< HEAD
     if (argc > 5){
         vx0Lower = atof(argv[4]);
         vx0Upper = atof(argv[5]);
