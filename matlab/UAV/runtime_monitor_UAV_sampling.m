@@ -2,8 +2,8 @@ clear all;
 close all;
 
 %% Input 
-test_set_start=4280;%4200;
-test_set_end = 4290;%4300;
+test_set_start=4829;%4280;%4200;
+test_set_end = 4840;%4290;%4300;
 
 %% Load data
 pred_step = 5;
@@ -12,20 +12,20 @@ pre_com = csvread('../../outputs/ct-model-5-2.csv');
 [theta,delimiterOut]=importdata('../../data/theta_list.txt');
 
 %% params
-omega_max=0.18; 
-omega_min=-omega_max;
+omega_max=0.3; 
+omega_min=-0.3;
 
 T=0.4;%discrete time interval dt
-para.num_p = 20;%number of omega particals
+para.num_p = 40;%number of omega particals
 para.max=omega_max;
 para.min=omega_min;
 np=1;% number of parameter;
-Ns=2;% the number of testing samples of trajectory  
+Ns=20;% the number of testing samples of trajectory  
 dOmega=[-0.045,0.045];
 delta = (omega_max - omega_min)/(2*para.num_p);
 dynamic.fun=@CTmodelDynamic; % dynamic functions
 dynamic.h=T;
-para.epsilon=0;%0.01;
+para.epsilon=0.01;
 dim=4;
 
 %% Construct CT model
