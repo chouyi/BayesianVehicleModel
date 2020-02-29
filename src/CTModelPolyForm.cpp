@@ -88,9 +88,9 @@ void CTModelPolynomialForm::computeOneStep(){
 
     /*-- Update for x --*/
     MultivariatePoly sinTimesVx = sineOmegaTByOmegaT.multiply(vx);
-    sinTimesVx.truncateAssign(maxDegree, env);
+    //sinTimesVx.truncateAssign(maxDegree, env);
     MultivariatePoly cosTimesVy = cosOmegaTMinusOneByOmegaT.multiply(vy);
-    cosTimesVy.truncateAssign(maxDegree, env);
+   // cosTimesVy.truncateAssign(maxDegree, env);
     x.scaleAndAddAssign(MpfiWrapper(1.0), sinTimesVx);
     x.scaleAndAddAssign(MpfiWrapper(1.0), cosTimesVy);
     x.truncateAssign(maxDegree,env);
@@ -98,9 +98,9 @@ void CTModelPolynomialForm::computeOneStep(){
 
     /*-- Update for y --*/
     MultivariatePoly cosTimesVx = cosOmegaTMinusOneByOmegaT.multiply(vx);
-    cosTimesVx.truncateAssign(maxDegree, env);
+    //cosTimesVx.truncateAssign(maxDegree, env);
     MultivariatePoly sinTimesVy = sineOmegaTByOmegaT.multiply(vy);
-    sinTimesVy.truncateAssign(maxDegree, env);
+   // sinTimesVy.truncateAssign(maxDegree, env);
     y.scaleAndAddAssign(-1.0, cosTimesVx);
     y.scaleAndAddAssign(1.0, sinTimesVy);
     y.truncateAssign(maxDegree, env);
@@ -108,9 +108,9 @@ void CTModelPolynomialForm::computeOneStep(){
 
     /*-- Update for vx --*/
     MultivariatePoly v11 = cosOmegaT.multiply(vx);
-    v11.truncateAssign(maxDegree, env);
+    //v11.truncateAssign(maxDegree, env);
     MultivariatePoly v12 = sineOmegaT.multiply(vy);
-    v12.truncateAssign(maxDegree, env);
+   // v12.truncateAssign(maxDegree, env);
     int vx_noiseID = createUniform(-0.2, 0.2);
     MultivariatePoly vx_noise(1.0,  vx_noiseID);
     vx = v11;
