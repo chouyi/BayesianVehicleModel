@@ -42,7 +42,7 @@ int main(int argc, char * argv[]){
     string outFileName = "output.csv";
     double vx0Lower = 8.0;
     double vx0Upper = 22.0;
-    double vx0Delta = 0.1;
+    double vx0Delta = 0.5;
     if (argc > 1){
         outFileName = string(argv[1]);
         std::cout << "Output File: " << outFileName << std::endl;
@@ -60,6 +60,10 @@ int main(int argc, char * argv[]){
         vx0Lower = atof(argv[4]);
         vx0Upper = atof(argv[5]);
         std::cout << "Velocity range: " << vx0Lower << "," << vx0Upper << std::endl;
+    }
+    if (argc > 6){
+        vx0Delta = atof(argv[6]);
+        std::cout << "Velocity step:" << vx0Delta << std::endl;
     }
 
   //  std::vector<double> omega0Values = { -0.171, -0.153,-0.135, -0.117, -0.099,   -0.081,  -0.063, -0.045,
