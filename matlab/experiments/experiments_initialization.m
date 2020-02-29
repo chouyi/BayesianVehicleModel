@@ -3,7 +3,7 @@ dim=4;
 
 % UAV model
 if model == 1
-    omega_max=0.18; 
+    omega_max=0.30; 
     omega_min=-omega_max;
     para.max=omega_max;
     para.min=omega_min;
@@ -12,17 +12,15 @@ if model == 1
     [theta,delimiterOut]=importdata('../../data/theta_list.txt');
 
     if pred_step==5
-        pre_com = csvread('../../outputs/ct-model-5-2.csv');
+        pre_com = csvread('../../outputs/ct-model-5-1.csv');
     elseif pred_step == 10
-        pre_com = csvread('../../outputs/ct-model-10-2.csv');    
+        pre_com = csvread('../../outputs/ct-model-10-1.csv');    
     elseif pred_step == 15
-        pre_com = csvread('../../outputs/ct-model-15-2.csv');        
+        pre_com = csvread('../../outputs/ct-model-15-1.csv');        
     end
     
     T=0.4;%discrete time interval dt
-    para.num_p = 20;%number of omega particals
-    para.max=omega_max;
-    para.min=omega_min;
+    para.num_p = 40;%number of omega particals
     np=1;% number of parameter;
 
     dOmega=[-0.045,0.045];

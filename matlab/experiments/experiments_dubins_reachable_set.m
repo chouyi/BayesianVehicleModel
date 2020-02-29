@@ -22,7 +22,7 @@ ptime = 0; % pause time to see figures before closing it
 model = 2; %dubins=2
 num_test = 500;
 
-obs_size = 4;
+obs_size = 5;
 obs_dist_min = 0;
 obs_dist_max = 0;
 

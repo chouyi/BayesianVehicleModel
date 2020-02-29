@@ -7,16 +7,16 @@ test_set_start=4200;
 
 %% Load data
 pred_step = 5;
-pre_com = csvread('../../outputs/ct-model-5-2.csv');
+pre_com = csvread('../../outputs/ct-model-5-1.csv');
 [M,delimiterOut]=importdata('../../data/UAV_data.txt');
 [theta,delimiterOut]=importdata('../../data/theta_list.txt');
 
 %% params
-omega_max=0.18; 
+omega_max=0.30; 
 omega_min=-omega_max;
 
 T=0.4;%discrete time interval dt
-para.num_p = 20;%number of omega particals
+para.num_p = 40;%number of omega particals
 dim=4;
 NT = update_step+1;
 training_set_start=test_set_start-1000;
@@ -90,22 +90,22 @@ for t = 1:NT
     % Only consider the last position
     if t== NT  
         sum1=0;
+        max_post = max(post);
         post_theta = [post;theta']';
         post_theta = sortrows(post_theta,1);
         for w_idx=1:para.num_p 
             w=post_theta(w_idx,2);
             [collision, reach_set] = oracle(obs_zone,w, x(2,t+1), x(4,t+1), x(1,t+1), x(3,t+1), pre_com);
-            rgb = [1-post_theta(w_idx,1) 1-post_theta(w_idx,1) 1-post_theta(w_idx,1)];
+            rgb = [1-post_theta(w_idx,1)/max_post 1-post_theta(w_idx,1)/max_post 1-post_theta(w_idx,1)/max_post];
 
             if collision==1
                 sum1=sum1 + post_theta(w_idx,1);
-                rgb = [1-post_theta(w_idx,1) 0 0];
             end
 
-            if post_theta(w_idx,1) < 0.01
-                continue;
-            end
-            patch(reach_set.Vertices(:,1)', reach_set.Vertices(:,2)', rgb, 'EdgeColor','none');
+%             if post_theta(w_idx,1) < 0.01
+%                 continue;
+%             end
+            patch(reach_set.Vertices(:,1)', reach_set.Vertices(:,2)', rgb, 'EdgeColor','k');
             hold on;
         end
         result_report(1,2) = sum1;

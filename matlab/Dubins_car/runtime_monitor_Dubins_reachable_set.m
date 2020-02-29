@@ -51,21 +51,21 @@ for t = 1:NT
     % Only consider the last position
     if t== NT    
         sum1=0;
+        max_post = max(post);        
         post_theta = [post;theta']';
         post_theta = sortrows(post_theta,1);
         for w_idx=1:para.num_p  
             w=post_theta(w_idx,2:end);
             [collision, reach_set] = oracle_Dubins(obs_zone, w(1), w(2), x(3,t+1), x(4,t+1), x(1,t+1), x(2,t+1), pre_com);
-            rgb = [1-post_theta(w_idx,1) 1-post_theta(w_idx,1) 1-post_theta(w_idx,1)];
+            rgb = [1-post_theta(w_idx,1)/max_post 1-post_theta(w_idx,1)/max_post 1-post_theta(w_idx,1)/max_post];
 
             if collision==1
                 sum1=sum1 + post_theta(w_idx,1);
-                rgb = [1-post_theta(w_idx,1) 0 0];
             end
-
-            if post_theta(w_idx,1) < 0.01
-                continue;
-            end
+% 
+%             if post_theta(w_idx,1) < 0.01
+%                 continue;
+%             end
             patch(reach_set.Vertices(:,1)', reach_set.Vertices(:,2)', rgb, 'EdgeColor','none');
             hold on;
         end

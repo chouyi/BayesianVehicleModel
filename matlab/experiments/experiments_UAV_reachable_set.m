@@ -1,5 +1,5 @@
-% clear;
-% close all;
+clear;
+close all;
 %%
 % Test: Collision detection -> accuracy including false alarm rate, time performance
 % 1-1: 5 steps, collision, close but not collision
@@ -16,27 +16,37 @@
 
 %% Setting
 pred_step_set = [5 10 15];
-update_step_set = [0 10 20 50 100];
+update_step_set = [20];
 ptime = 0; % pause time to see figures before closing it
 
 model = 1; %UAV=1
-num_test = 500;
+num_test = 100;
 
-obs_size = 4;
-obs_dist_min = 0;
-obs_dist_max = 0;
+obs_size = 5;
+obs_dist_min = 5;
+obs_dist_max = 5;
+
+para.epsilon=0.1;
 
 mkdir report
 output_filename = 'result_report.csv';
+load curve_testpoints.mat;
+load straight_testpoints.mat;
+
+for i = 1:2:100
+    mixed(i,1) = curve_num(i,1);
+    mixed(i+1,1) = straight_num(i,1);
+end
 
 %% 
 for j = 1:size(pred_step_set,2)
     for l = 1:size(update_step_set,2)
     update_step = update_step_set(l);  
     pred_step = pred_step_set(j);  
+%     categorize_data;
     
     NT = update_step+1;
-    experiments_initialization;
+    experiments_initialization; %%%
 
     %% Real-time part
     % Simulation
@@ -46,7 +56,18 @@ for j = 1:size(pred_step_set,2)
         para.prior=para.prior_initial;
 
         % test point
-        test_set_start = randi([3200 5200],1,1);
+        ra = randi([1 3],1,1);
+        ra=2;
+        if ra == 1
+            test_set_start = straight_num(k) + 2200 -2;
+        elseif ra ==2
+            test_set_start = curve_num(k) + 2200 -2;
+        else
+            test_set_start = mixed(k) + 2200 -2;  
+        end
+%         test_set_start = randi([3200 5200],1,1);
+
+
         result_report(k,1) = test_set_start;
         M_test = M(test_set_start:test_set_start+1+pred_step+NT, :);
 
@@ -103,26 +124,24 @@ for j = 1:size(pred_step_set,2)
 
             %%compute posterior p(omega(t)|x(t+1))
             post=computePosterior_CTmodel(para,x(:,t),x(:,t+1),CT); 
-            para.prior=post;%(1-para.epsilon)*post+para.epsilon*para.prior_initial;
+            para.prior=(1-para.epsilon)*post+para.epsilon*para.prior_initial;
 
             if t== NT
                 %%predict prob of collision after k steps at kT
                 sum1=0;
+                max_post = max(post);
                 post_theta = [post;theta']';
                 post_theta = sortrows(post_theta,1);
                 for w_idx=1:para.num_p 
                     w=post_theta(w_idx,2);
                     [collision, reach_set] = oracle(obs_zone, w, x(2,t+1), x(4,t+1), x(1,t+1), x(3,t+1), pre_com);
-                    rgb = [1-post_theta(w_idx,1) 1-post_theta(w_idx,1) 1-post_theta(w_idx,1)];
+%                     rgb = [1-post_theta(w_idx,1) 1-post_theta(w_idx,1) 1-post_theta(w_idx,1)];
+                    rgb = [1-post_theta(w_idx,1)/max_post 1-post_theta(w_idx,1)/max_post 1-post_theta(w_idx,1)/max_post];
 
                     if collision==1
                         sum1=sum1 + post_theta(w_idx,1);
-                        rgb = [1-post_theta(w_idx,1) 0 0];
                     end
 
-                    if post_theta(w_idx,1) < 0.05
-                        continue;
-                    end
                     patch(reach_set.Vertices(:,1)', reach_set.Vertices(:,2)', rgb, 'EdgeColor','none');
                     hold on;
                 end
@@ -138,11 +157,11 @@ for j = 1:size(pred_step_set,2)
         hold on;    
         plot(M_test(t+1+pred_step, idx.xx), M_test(t+1+pred_step, idx.xy), 'or');
         hold on;
-    %     filename = strcat('./figures/',string(update_step), '-', string(pred_step), '-', string(k), '.png');
-    %     filename_fig = strcat('./figures/',string(update_step), '-', string(pred_step), '-', string(k), '.fig');
-    %     saveas(gcf,filename)
-    %     saveas(gcf,filename_fig)
         set(gca,'DataAspectRatio', [1 1 1]);
+%         filename = strcat('./figures/UAV_reachable_set-',string(update_step), '-', string(pred_step), '-', string(k), '.png');
+%         filename_fig = strcat('./figures/UAV_reachable_set-',string(update_step), '-', string(pred_step), '-', string(k), '.fig');
+%         saveas(gcf,filename)
+%         saveas(gcf,filename_fig)
 %         pause(ptime);
         close all;
     end
