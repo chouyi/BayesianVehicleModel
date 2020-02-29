@@ -5,7 +5,7 @@
 #include "CTModelPolyForm.hh"
 #include "PolynomialFunctions.hh"
 
-bool addNoiseToVelocity = false;
+bool addNoiseToVelocity = true;
 
 void CTModelPolynomialForm::initializeForms() {
     /*-- make up the initial distributions --*/
