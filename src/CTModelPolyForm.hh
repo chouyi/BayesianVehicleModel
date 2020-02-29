@@ -20,8 +20,8 @@ class CTModelPolynomialForm {
     MpfiWrapper x0;
     MpfiWrapper y0;
     MpfiWrapper deltaT;
-    double omegaLow = -0.18;
-    double omegaHi = 0.18;
+    double omegaLow = -0.3;
+    double omegaHi = 0.3;
 
     std::map<int, DistributionInfoPtr> distrInfo;
     std::map<int, MpfiWrapper> env;
