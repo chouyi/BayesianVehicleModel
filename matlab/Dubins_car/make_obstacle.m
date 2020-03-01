@@ -1,5 +1,5 @@
 function obs_zone = make_obstacle(obs_center, dist_min, dist_max)
-    size = 2/4;
+    size = 2/2;
     
     obs_coor = [-size -size size size; -size size size -size];
     

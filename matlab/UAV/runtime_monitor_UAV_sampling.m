@@ -2,11 +2,11 @@ clear all;
 close all;
 
 %% Input 
-test_set_start=4829;%4280;%4200;
-test_set_end = 4840;%4290;%4300;
+test_set_start=2721;%4280;%4200;
+test_set_end = 2731;%4290;%4300;
 
 %% Load data
-pred_step = 5;
+pred_step = 10;
 pre_com = csvread('../../outputs/ct-model-5-2.csv');
 [M,delimiterOut]=importdata('../../data/UAV_data.txt');
 [theta,delimiterOut]=importdata('../../data/theta_list.txt');
@@ -20,7 +20,7 @@ para.num_p = 40;%number of omega particals
 para.max=omega_max;
 para.min=omega_min;
 np=1;% number of parameter;
-Ns=20;% the number of testing samples of trajectory  
+Ns=100;% the number of testing samples of trajectory  
 dOmega=[-0.045,0.045];
 delta = (omega_max - omega_min)/(2*para.num_p);
 dynamic.fun=@CTmodelDynamic; % dynamic functions
@@ -96,19 +96,20 @@ for t = 1:NT
 
     post=computePosterior_CTmodel(para,x(:,t),x(:,t+1),CT); 
     para.prior=(1-para.epsilon)*post+para.epsilon*para.prior_initial;
-
+    
     % Only consider the last position
     if t== NT  
         sum1=0;
         post_theta = [post;theta']';
         post_theta = sortrows(post_theta,1);
-        for w_idx=1:para.num_p 
+        
+        for w_idx=31:40%para.num_p 
             w=post_theta(w_idx,2);
             
             pred_X=predict_ksteps_sampling_UAV(Ns,dOmega,w,para,x(:,t+1),dynamic,pred_step);
             temp_pc=Prob_collision(pred_X(1,:,pred_step),pred_X(3,:,pred_step),obs_zone);
             
-            sum1=sum1 + temp_pc*post(w_idx);
+            sum1=sum1 + temp_pc*post_theta(w_idx,1);
             for i=1:size(pred_X,2)
                 x1(1,:)=pred_X(1,i,:);
                 y1(1,:)=pred_X(3,i,:);
