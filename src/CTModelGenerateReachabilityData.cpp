@@ -13,7 +13,7 @@ void ctModelGenerateReachabilityData(std::vector<double> omegaValues,
     ofstream outFileHandle(outputFileName);
     for (double omega0: omegaValues){
         double vx0 = vLow;
-        for (; vx0 < vHi; vx0 += vDelta){
+        for (; vx0 < vHi-(1e-06); vx0 += vDelta){
             CTModelPolynomialForm ctmp(omega0, vx0, vx0+vDelta, -0.05, 0.05, deltaT, numSteps, maxDegree );
             std::cout << "omega: " << omega0 << std::endl;
             std::cout << "vx0 : " << vx0 << " , " << vx0 + vDelta << std::endl;

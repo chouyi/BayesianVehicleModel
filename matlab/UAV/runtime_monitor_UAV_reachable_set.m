@@ -3,7 +3,7 @@ close all;
 
 %% Input 
 update_step = 10;
-test_set_start=2721;
+test_set_start=4200;
 
 %% Load data
 pred_step = 5;
@@ -90,19 +90,23 @@ for t = 1:NT
     % Only consider the last position
     if t== NT  
         sum1=0;
+        max_post = max(post);
         post_theta = [post;theta']';
         post_theta = sortrows(post_theta,1);
         rgb_scale=max(post);
         for w_idx=1:para.num_p 
             w=post_theta(w_idx,2);
             [collision, reach_set] = oracle(obs_zone,w, x(2,t+1), x(4,t+1), x(1,t+1), x(3,t+1), pre_com);
-            %rgb = [1-post_theta(w_idx,1) 1-post_theta(w_idx,1) 1-post_theta(w_idx,1)];
-            rgb = [1-post_theta(w_idx,1)/rgb_scale 1-post_theta(w_idx,1)/rgb_scale 1-post_theta(w_idx,1)/rgb_scale];
+            rgb = [1-post_theta(w_idx,1)/max_post 1-post_theta(w_idx,1)/max_post 1-post_theta(w_idx,1)/max_post];
+
             if collision==1
                 sum1=sum1 + post_theta(w_idx,1);
             end
 
-            patch(reach_set.Vertices(:,1)', reach_set.Vertices(:,2)', rgb, 'EdgeColor','none');
+%             if post_theta(w_idx,1) < 0.01
+%                 continue;
+%             end
+            patch(reach_set.Vertices(:,1)', reach_set.Vertices(:,2)', rgb, 'EdgeColor','k');
             hold on;
         end
         result_report(1,2) = sum1;

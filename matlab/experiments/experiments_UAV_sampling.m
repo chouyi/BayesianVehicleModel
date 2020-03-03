@@ -23,7 +23,7 @@ model = 1; %UAV=1
 num_test = 1;
 Ns=100;% the number of testing samples of trajectory  
 
-obs_size = 4;
+obs_size = 5;
 obs_dist_min = 0;
 obs_dist_max = 0;
 

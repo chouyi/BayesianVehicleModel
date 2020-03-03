@@ -5,6 +5,8 @@
 #include "CTModelPolyForm.hh"
 #include "PolynomialFunctions.hh"
 
+bool addNoiseToVelocity = true;
+
 void CTModelPolynomialForm::initializeForms() {
     /*-- make up the initial distributions --*/
     // Let us initialize x, y : currently to (0,0)
@@ -93,7 +95,7 @@ void CTModelPolynomialForm::computeOneStep(){
     cosTimesVy.truncateAssign(maxDegree, env);
     x.scaleAndAddAssign(MpfiWrapper(1.0), sinTimesVx);
     x.scaleAndAddAssign(MpfiWrapper(1.0), cosTimesVy);
-    x.truncateAssign(maxDegree,env);
+    //x.truncateAssign(maxDegree,env);
     x.centerAssign(env);
 
     /*-- Update for y --*/
@@ -103,7 +105,7 @@ void CTModelPolynomialForm::computeOneStep(){
     sinTimesVy.truncateAssign(maxDegree, env);
     y.scaleAndAddAssign(-1.0, cosTimesVx);
     y.scaleAndAddAssign(1.0, sinTimesVy);
-    y.truncateAssign(maxDegree, env);
+    //y.truncateAssign(maxDegree, env);
     y.centerAssign(env);
 
     /*-- Update for vx --*/
@@ -111,23 +113,27 @@ void CTModelPolynomialForm::computeOneStep(){
     v11.truncateAssign(maxDegree, env);
     MultivariatePoly v12 = sineOmegaT.multiply(vy);
     v12.truncateAssign(maxDegree, env);
-    int vx_noiseID = createUniform(-0.2, 0.2);
-    MultivariatePoly vx_noise(1.0,  vx_noiseID);
     vx = v11;
     vx.scaleAndAddAssign(-1.0, v12);
-    vx.scaleAndAddAssign(1.0, vx_noise);
-    vx.truncateAssign(maxDegree, env);
+    if (addNoiseToVelocity) {
+        vx.addToConst(MpfiWrapper(-0.2, 0.2));
+    }
+   // vx.truncateAssign(maxDegree, env);
     vx.centerAssign(env);
 
     /*-- Update for vy --*/
     MultivariatePoly v21 = sineOmegaT.multiply(vx);
+    v21.truncateAssign(maxDegree, env);
     MultivariatePoly v22 = cosOmegaT.multiply(vy);
-    int vy_noiseID = createUniform(-0.2, 0.2);
-    MultivariatePoly vy_noise(1.0,  vy_noiseID);
+    v22.truncateAssign(maxDegree, env);
+    //int vy_noiseID = createUniform(-0.2, 0.2);
+    //MultivariatePoly vy_noise(1.0,  vy_noiseID);
     vy = v21;
     vy.scaleAndAddAssign(1.0, v22);
-    vy.scaleAndAddAssign(1.0, vy_noise);
-    vy.truncateAssign(maxDegree, env);
+    if (addNoiseToVelocity) {
+        vy.addToConst(MpfiWrapper(-0.2, 0.2));
+    }
+   // vy.truncateAssign(maxDegree, env);
     vy.centerAssign(env);
 
     /*-- Update for omega --*/
@@ -148,14 +154,6 @@ void CTModelPolynomialForm::computeNStepForm(bool debug){
             MpfiWrapper omegaRng = omega.evaluate(env);
             omegaRng= intersect(omegaRng, MpfiWrapper(omegaLow, omegaHi));
             omega = MultivariatePoly(omegaRng);
-
-            MpfiWrapper vxRng = vx.evaluate(env);
-            vx = MultivariatePoly(vxRng);
-
-            MpfiWrapper vyRng = vx.evaluate(env);
-            vy = MultivariatePoly(vyRng);
-
-
         }
         if (debug){
             std::cout << "x = " << std::endl;
