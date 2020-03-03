@@ -74,10 +74,7 @@ int main(int argc, char * argv[]){
                                         -0.0225,-0.0075, 0.0075,   0.0225, 0.0375,0.0525,0.0675,0.0825,0.0975,
                                         0.1125, 0.1275,0.1425, 0.1575, 0.1725, 0.1875, 0.2025, 0.2175, 0.2325,
                                         0.2475, 0.2625, 0.2775,0.2925};
-<<<<<<< HEAD
-=======
 
->>>>>>> 5488f8aa99f2af17d8552faacda86cdfeb988b54
 
     auto start = chrono::high_resolution_clock::now();
     ctModelGenerateReachabilityData(omega0Values, vx0Lower, vx0Upper, vx0Delta, 0.4, numSteps, maxDegree, outFileName);
